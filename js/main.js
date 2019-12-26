@@ -6,29 +6,29 @@ const submit = document.querySelector('#submit');
 const responseField = document.querySelector('#responseField');
 
 //AJAX function
-const suggestions = () => {
+const getSuggestions = async () => {
     const wordQuery = inputField.value;
     const endpoint = `${url}${queryParams}${wordQuery}`;
-
-    const xhr = new XMLHttpRequest();
-    xhr.responseType = 'json';
-    xhr.onreadystatechange = () => {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-            //returning results
-            renderResponse(xhr.response);
+    try {
+        const response = await fetch(endpoint, {
+            cache: 'no-cache'
+        });
+        if (response.ok) {
+            const jsonResponse = await response.json();
+            renderResponse(jsonResponse);
         }
+    } catch (error) {
+        console.log(error);
     }
-    xhr.open('GET', endpoint);
-    xhr.send();
-}
 
+}
 //function for displaying returned results
 const displaySuggestions = (event) => {
     event.preventDefault();
     while (responseField.firstChild) {
-        responseField.removeChild(responseField.lastChild);
+        responseField.removeChild(responseField.firstChild);
     }
-    suggestions();
+    getSuggestions();
 }
 
 submit.addEventListener('click', displaySuggestions);
